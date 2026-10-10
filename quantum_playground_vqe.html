@@ -75,6 +75,13 @@ button,.lay button,.play{border-radius:0}.play{width:42px;height:42px}
 .lt{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap;font-size:11px;color:var(--acc)}
 .lb{position:absolute;top:44px;font-size:11px;color:var(--mut);white-space:nowrap}.lb.l{left:0}.lb.r{right:0}
 .lc.wide{grid-column:1/-1;border-top:1px solid var(--line);border-right:0}.qg{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:16px;align-items:start}@media(max-width:1000px){.qg{grid-template-columns:1fr}}.learn{margin-bottom:24px}.eq sub{font-size:10px}
+.card{border:0;padding:4px 0 12px}.learn{border:0;border-top:1px solid #e0e0e0}.lc{border-right-color:#eef0f4}
+.chip{border-color:transparent;background:#f3f4f8}.chip.on{background:var(--acc)}canvas{border:0}.stage{border-color:#e6e8ee}
+.lay{flex-wrap:wrap}.lay i{display:inline-block;width:10px;height:10px;margin:0 3px 0 10px;vertical-align:-1px}
+.side{margin-top:6px;border-top:1px solid #eef0f4;padding-top:6px}.side summary{cursor:pointer;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut)}.side .pr{font-size:11px}
+.circ svg{display:block;margin:0 auto}
+.duo{display:grid;grid-template-columns:230px minmax(0,1fr);gap:16px;align-items:start}@media(max-width:1000px){.duo{grid-template-columns:1fr}}
+.duo canvas{max-width:220px}.cmp .pr{grid-template-columns:92px 1fr 42px 50px;gap:6px;font-size:11px;margin:2px 0}.cmp .pr .bar{height:7px}
 </style></head><body>
 <header><h1><b>Quantum</b> Playground <span class="mut" style="font-weight:400">· Variational Quantum Eigensolver</span></h1><span id="st" class="mut" style="margin-left:auto"></span></header>
 <div class="tb">
@@ -102,10 +109,9 @@ button,.lay button,.play{border-radius:0}.play{width:42px;height:42px}
 <div class="col"><h2>Variational circuit</h2>
  <div class="hint">Hover over a step to look inside it</div><div class="pipe" id="pipe"><div class="stage"><b>1 · Prepare</b><span class="t">reference |ψ₀⟩</span><div class="more"></div></div><div class="stage"><b>2 · Ansatz</b><span class="t">U(θ) layers</span><div class="more"></div></div><div class="stage"><b>3 · Measure</b><span class="t">Z &amp; X bases</span><div class="more"></div></div><div class="stage"><b>4 · Cost</b><span class="t">E = ⟨H⟩</span><div class="more"></div></div><div class="stage"><b>5 · Optimize</b><span class="t">θ ← θ − η∇E</span><div class="more"></div></div></div>
  <div class="card"><div class="lay"><span class="mut">Layers (depth)</span><button id="lm">−</button><b id="lv">2</b><button id="lp">+</button>
-  <span class="mut" style="margin-left:auto">gate labels show the angle θ in radians</span></div>
+  <span class="mut" style="margin-left:auto"><i style="background:#ffb3b8"></i>H<i style="background:#ffd6a5"></i>X<i style="background:#d4bbff"></i>Ry<i style="background:#9ef0f0"></i>Rz<i style="background:#6929c4"></i>CNOT<i style="background:#d9d9d9"></i>Measure · numbers = θ (rad)</span></div>
   <div class="circ" id="circ"></div></div>
- <div class="card"><h3>Classical optimizer · parameters θ <span class="mut" style="font-weight:400" id="evs"></span></h3>
-  <div class="pr mut"><span>parameter</span><span>value (−π … π)</span><span>θ</span><span style="text-align:right">∂E/∂θ</span></div><div id="params"></div></div>
+<div class="duo"><div class="card"><h3>Energy landscape (θ₀, θ₁ slice)</h3><canvas id="map" width="30" height="30"></canvas><div class="mut" style="font-size:11px">Dark = low energy. The dot is the current θ; the line is the optimizer's path.</div></div><div class="card cmp"><h3>Parameters θ <span class="mut" style="font-weight:400" id="evs"></span></h3><div class="pr mut"><span>parameter</span><span>value (−π … π)</span><span>θ</span><span style="text-align:right">∂E/∂θ</span></div><div id="params"></div></div></div>
 </div>
 <div class="col"><h2>Output</h2>
  <div class="card"><div class="kpi"><div>Energy E(θ)<b id="E"></b></div><div>Error vs exact<b id="err"></b></div></div>
@@ -113,8 +119,8 @@ button,.lay button,.play{border-radius:0}.play{width:42px;height:42px}
   <div class="mut" style="font-size:11px"><span style="color:var(--acc)">━</span> measured &nbsp;<span style="color:#9aa3b8">━</span> exact ⟨H⟩ &nbsp;<span style="color:#b7e4cf">▮</span> chemical accuracy</div></div>
  <div class="card"><h3>Measurement outcomes</h3><svg id="hist" viewBox="0 0 300 100" width="100%"></svg>
   <table id="meas"></table></div>
- <div class="card"><h3>Energy landscape (θ₀, θ₁ slice)</h3><canvas id="map" width="30" height="30"></canvas>
-  <div class="mut" style="font-size:11px">Dark = low energy. The dot is the current θ; the line is the optimizer's path.</div></div>
+ 
+
 </div></main>
 <details class="learn v" open><summary>The problem · why does H₂ need a quantum computer? <span>click to collapse</span></summary>
 <div class="lg">
@@ -139,7 +145,7 @@ button,.lay button,.play{border-radius:0}.play{width:42px;height:42px}
 <div class="col"><h2>Variational circuit</h2>
  <div class="hint">Hover over a step to look inside it</div><div class="pipe" id="qpipe"><div class="stage"><b>1 · Prepare</b><span class="t">|+⟩ on every qubit</span><div class="more"></div></div><div class="stage"><b>2 · Cost</b><span class="t">e^(−iγH_C) · RZZ</span><div class="more"></div></div><div class="stage"><b>3 · Mixer</b><span class="t">e^(−iβB) · RX</span><div class="more"></div></div><div class="stage"><b>4 · Measure</b><span class="t">Z basis → ⟨cut⟩</span><div class="more"></div></div><div class="stage"><b>5 · Optimize</b><span class="t">θ ← θ − η∇E</span><div class="more"></div></div></div>
  <div class="card"><div class="lay"><span class="mut">Layers p</span><button id="qlm">−</button><b id="qlv">2</b><button id="qlp">+</button>
-  <span class="mut" style="margin-left:auto">blocks show the angle in radians</span></div>
+  <span class="mut" style="margin-left:auto"><i style="background:#ffb3b8"></i>H<i style="background:#ffd6a5"></i>X<i style="background:#9ef0f0"></i>Cost · RZZ<i style="background:#a6c8ff"></i>Mixer · RX<i style="background:#d9d9d9"></i>Measure · numbers = angle (rad)</span></div>
   <div class="circ" id="cq"></div></div>
  <div class="card"><h3>Classical optimizer · parameters (γ, β) <span class="mut" style="font-weight:400" id="qevs"></span></h3>
   <div class="pr mut"><span>parameter</span><span>value (−π … π)</span><span>θ</span><span style="text-align:right">∂E/∂θ</span></div><div id="qparams"></div></div>
@@ -196,19 +202,19 @@ function step(){const r=run(th,S.shots);evals++;hist.push({E:r.E,X:run(th,0).E})
  else{g=grad();if(S.opt==='gd')th=th.map((x,i)=>x-S.lr*g[i]);else{t++;th=th.map((x,i)=>{m1[i]=.9*m1[i]+.1*g[i];m2[i]=.999*m2[i]+.001*g[i]**2;return x-S.lr*(m1[i]/(1-.9**t))/(Math.sqrt(m2[i]/(1-.999**t))+1e-8)})}}
  lastG=g;it++;last=r;render();flash()}
 function flash(){const c=[...document.querySelectorAll((S.prob==='qaoa'?'#mq':'#mv')+' .stage')];c.forEach((e,i)=>setTimeout(()=>{c.forEach(x=>x.classList.remove('on'));e.classList.add('on');if(i===4)setTimeout(()=>e.classList.remove('on'),160)},i*70))}
-const GC={RY:'#d4bbff',RZ:'#d4bbff',RX:'#d4bbff',H:'#ffb3b8',X:'#e8daff'},wt=a=>.3+.7*Math.min(Math.abs(a)/Math.PI,1),mixc=(b,w)=>'rgb('+b.map(c=>Math.round(255-(255-c)*w)).join(',')+')',col=a=>mixc(a>=0?[29,43,83]:[232,113,10],wt(a)),tx=a=>wt(a)>.6?'#fff':'#1a1f36';
+const GC={RY:'#d4bbff',RZ:'#9ef0f0',RX:'#a6c8ff',H:'#ffb3b8',X:'#ffd6a5'},wt=a=>.3+.7*Math.min(Math.abs(a)/Math.PI,1),mixc=(b,w)=>'rgb('+b.map(c=>Math.round(255-(255-c)*w)).join(',')+')',col=a=>mixc(a>=0?[29,43,83]:[232,113,10],wt(a)),tx=a=>wt(a)>.6?'#fff':'#1a1f36';
 function circuit(){const X0=96,CW=54,Y=[74,138];let free=[1,1],cols={},lay={},mx=0;
  ops.forEach((o,k)=>{const qs=o.t==='CX'?[0,1]:[o.q];let c=o.l<0?0:Math.max(...qs.map(q=>free[q]));if(o.l>=0&&lay[o.l]==null){const m=Math.max(...free);free=[m,m];c=m;lay[o.l]={a:c,b:c}}
   if(o.l<0)c=0;qs.forEach(q=>free[q]=c+1);cols[k]=c;if(o.l>=0){lay[o.l].b=c;mx=Math.max(mx,c)}});
- const W=X0+(mx+3)*CW+90,x=c=>X0+c*CW;let s=`<svg width="${W}" height="196" font-size="12">`;
+ const W=X0+(mx+1.6)*CW+96,x=c=>X0+c*CW;let s=`<svg width="${W}" height="196" font-size="12">`;
  Y.forEach((y,q)=>s+=`<line x1="64" x2="${x(mx+1)+20}" y1="${y}" y2="${y}" stroke="#9aa3b8"/><text x="8" y="${y+4}" fill="#1a1f36">q${q} |0⟩</text>`);
  s+=`<text x="${x(0)-22}" y="20" fill="#6b7280" font-size="10">PREPARE</text>`;
- Object.entries(lay).forEach(([l,v])=>s+=`<rect x="${x(v.a)-26}" y="26" width="${(v.b-v.a)*CW+52}" height="150" rx="0" fill="none" stroke="#c9cfdd" stroke-dasharray="4 3"/><text x="${x(v.a)-20}" y="40" fill="#6b7280" font-size="10">${l<S.L?'LAYER '+(+l+1):'FINAL ROTATIONS'}</text>`);
+ Object.entries(lay).forEach(([l,v])=>s+=`<rect x="${x(v.a)-26}" y="26" width="${(v.b-v.a)*CW+52}" height="150" rx="0" fill="none" stroke="#c9cfdd" stroke-dasharray="4 3"/><text x="${x(v.a)-20}" y="40" fill="#6b7280" font-size="10">${l<S.L?'LAYER '+(+l+1):'FINAL'}</text>`);
  s=s.replace(/(<line[^>]*\/><text[^>]*>q\d[^<]*<\/text>)/g,'$1');
  ops.forEach((o,k)=>{const cx=x(cols[k]);if(o.t==='CX'){const c=o.q,tg=1-c;s+=`<line x1="${cx}" x2="${cx}" y1="${Y[c]}" y2="${Y[tg]}" stroke="#6929c4" stroke-width="2"/><circle cx="${cx}" cy="${Y[c]}" r="4.5" fill="#6929c4"/><circle cx="${cx}" cy="${Y[tg]}" r="11" fill="#6929c4"/><path d="M${cx-11} ${Y[tg]}h22M${cx} ${Y[tg]-11}v22" stroke="#fff" stroke-width="2"/>`}
   else{const a=o.p==null?0:o.s*th[o.p],fx=o.p==null?'#fff':col(a);s+=`<rect x="${cx-20}" y="${Y[o.q]-15}" width="40" height="30" rx="0" fill="${GC[o.t]||'#e0e0e0'}"/><text x="${cx}" y="${Y[o.q]+4}" text-anchor="middle" fill="#161616" font-weight="600">${o.t[0]}${(o.t[1]||'').toLowerCase()}</text>`+(o.p!=null?`<text x="${cx}" y="${Y[o.q]+29}" text-anchor="middle" fill="#6b7280" font-size="10">${f(a,2)}</text>`:'')}});
  const mxx=x(mx+1.6);Y.forEach(y=>s+=`<rect x="${mxx-20}" y="${y-15}" width="40" height="30" rx="0" fill="#d9d9d9"/><path d="M${mxx-11} ${y+7}a11 11 0 0 1 22 0" fill="none" stroke="#1d2b53"/><path d="M${mxx} ${y+7}l7-12" stroke="#e8710a" stroke-width="2"/>`);
- s+=`<text x="${mxx-20}" y="20" fill="#6b7280" font-size="10">MEASURE (Z, then H⊗H → X)</text><path d="M${mxx+24} 106h26" stroke="#1d2b53" stroke-width="2" marker-end="url(#a)"/><defs><marker id="a" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0L8 4L0 8z" fill="#1d2b53"/></marker></defs><text x="${mxx+54}" y="110" class="eq" fill="#1d2b53" font-style="italic">⟨H⟩</text></svg>`;
+ s+=`<text x="${mxx-20}" y="20" fill="#6b7280" font-size="10">MEASURE · Z / X</text><path d="M${mxx+24} 106h26" stroke="#1d2b53" stroke-width="2" marker-end="url(#a)"/><defs><marker id="a" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0L8 4L0 8z" fill="#1d2b53"/></marker></defs><text x="${mxx+54}" y="110" class="eq" fill="#1d2b53" font-style="italic">⟨H⟩</text></svg>`;
  $('#circ').innerHTML=s}
 function render(){if(S.prob==='qaoa')return renderQ();const T=th,r=last;circuit();$('#it').textContent=it;$('#evs').textContent=`· ${evals} circuit evaluations`;
  $('#params').innerHTML=P.map((l,i)=>{const w=Math.abs(T[i])/Math.PI*50;return`<div class="pr"><span>${l}</span><div class="bar"><i style="left:${T[i]>=0?50:50-w}%;width:${w}%;background:${T[i]>=0?'#1d2b53':'#e8710a'}"></i></div><span>${f(T[i],2)}</span><em>${f(lastG[i]||0,3)}</em></div>`}).join('');
@@ -287,14 +293,14 @@ function circQ(){const n=Math.min(G.n,5),Y=i=>50+i*36,X0=70,LW=150,W=X0+44+S.p*L
  const tall=(x,w,t,sub,fill,tc='#fff')=>`<rect x="${x}" y="${Y(0)-20}" width="${w}" height="${Y(n-1)-Y(0)+40}" rx="0" fill="${fill}"/><text x="${x+w/2}" y="${(Y(0)+Y(n-1))/2}" text-anchor="middle" fill="${tc}" font-weight="600">${t}</text><text x="${x+w/2}" y="${(Y(0)+Y(n-1))/2+15}" text-anchor="middle" fill="${tc}" font-size="10">${sub}</text>`;
  let s=`<svg width="${W}" height="${H}" font-size="12">`;
  for(let i=0;i<n;i++){s+=`<line x1="52" x2="${W-40}" y1="${Y(i)}" y2="${Y(i)}" stroke="#9aa3b8"/><text x="6" y="${Y(i)+4}" fill="#1a1f36">q${i} |0⟩</text>`;
-  if(S.qin==='plus')s+=bx(X0,i,'H','#ffb3b8','#161616');else if(bs[i]==='1')s+=bx(X0,i,'X','#e8daff','#161616')}
+  if(S.qin==='plus')s+=bx(X0,i,'H','#ffb3b8','#161616');else if(bs[i]==='1')s+=bx(X0,i,'X','#ffd6a5','#161616')}
  if(S.qin==='dicke')s+=tall(X0-24,48,'Dicke','k='+(G.n>>1),'#e8daff','#161616');
  if(G.n>5)s+=`<text x="6" y="${Y(n-1)+26}" fill="#6b7280" font-size="10">⋮ ${G.n} qubits in total</text>`;
  for(let l=0;l<S.p;l++){const x0=X0+44+l*LW,g=th[2*l],b=th[2*l+1];
   s+=`<rect x="${x0-10}" y="6" width="${LW-12}" height="${H-16}" rx="0" fill="none" stroke="#c9cfdd" stroke-dasharray="4 3"/><text x="${x0-4}" y="18" fill="#6b7280" font-size="10">LAYER ${l+1}</text>`;
-  s+=tall(x0,64,'Cost','γ'+(l+1)+'='+f(g,2),'#bae6ff','#161616');
-  if(tm)s+=tall(x0+72,52,S.mix==='xy'?'XY':'Grover','β'+(l+1)+'='+f(b,2),'#d4bbff','#161616');
-  else{for(let i=0;i<n;i++)s+=bx(x0+96,i,'Rx','#d4bbff','#161616');s+=`<text x="${x0+96}" y="${Y(n-1)+34}" text-anchor="middle" fill="#6b7280" font-size="10">β${l+1}=${f(b,2)}</text>`}}
+  s+=tall(x0,64,'Cost','γ'+(l+1)+'='+f(g,2),'#9ef0f0','#161616');
+  if(tm)s+=tall(x0+72,52,S.mix==='xy'?'XY':'Grover','β'+(l+1)+'='+f(b,2),'#a6c8ff','#161616');
+  else{for(let i=0;i<n;i++)s+=bx(x0+96,i,'Rx','#a6c8ff','#161616');s+=`<text x="${x0+96}" y="${Y(n-1)+34}" text-anchor="middle" fill="#6b7280" font-size="10">β${l+1}=${f(b,2)}</text>`}}
  const mx=W-60;for(let i=0;i<n;i++)s+=`<rect x="${mx-16}" y="${Y(i)-13}" width="32" height="26" rx="0" fill="#d9d9d9"/><path d="M${mx-9} ${Y(i)+6}a9 9 0 0 1 18 0" fill="none" stroke="#1d2b53"/><path d="M${mx} ${Y(i)+6}l6-10" stroke="#e8710a" stroke-width="2"/>`;
  $('#cq').innerHTML=s+'</svg>'}
 function renderQ(){const r=last,mc=Q?Q.maxcut:null,W=G.edges.length,rb=W/2;
