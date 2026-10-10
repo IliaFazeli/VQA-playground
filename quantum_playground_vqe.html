@@ -74,6 +74,7 @@ button,.lay button,.play{border-radius:0}.play{width:42px;height:42px}
 .mk{position:absolute;top:22px;width:3px;height:15px;transform:translateX(-50%)}.mk.cur{top:16px;height:27px;width:5px;background:var(--acc)}
 .lt{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap;font-size:11px;color:var(--acc)}
 .lb{position:absolute;top:44px;font-size:11px;color:var(--mut);white-space:nowrap}.lb.l{left:0}.lb.r{right:0}
+.lc.wide{grid-column:1/-1;border-top:1px solid var(--line);border-right:0}.qg{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:16px;align-items:start}@media(max-width:1000px){.qg{grid-template-columns:1fr}}.learn{margin-bottom:24px}.eq sub{font-size:10px}
 </style></head><body>
 <header><h1><b>Quantum</b> Playground <span class="mut" style="font-weight:400">· Variational Quantum Eigensolver</span></h1><span id="st" class="mut" style="margin-left:auto"></span></header>
 <div class="tb">
@@ -88,13 +89,6 @@ button,.lay button,.play{border-radius:0}.play{width:42px;height:42px}
  <label>Shots<select id="shots"><option value="0">∞ (exact)</option><option value="100">100</option><option value="1000">1000</option><option value="10000">10000</option></select></label>
  <label>Engine<select id="eng"><option value="qiskit">Qiskit backend</option><option value="js">Browser (JS)</option></select></label>
 </div>
-<details class="learn v" open><summary>The problem · why does H₂ need a quantum computer? <span>click to collapse</span></summary>
-<div class="lg">
- <div class="lc"><h5>The molecule</h5><svg id="mol" viewBox="0 0 300 250" width="100%"></svg>
-  <div class="mut" style="margin:6px 0 4px">Electron configuration <span>(click one)</span></div><div id="cfg" class="chips"></div><div id="cfgi" class="mut"></div></div>
- <div class="lc"><h5>The Hamiltonian · H = Σ cᵢPᵢ <span>(hover or click a term)</span></h5><div id="chips" class="chips"></div><div id="pdet"></div></div>
- <div class="lc"><h5>The variational idea</h5><div id="idea"></div><div id="live"></div></div>
-</div></details>
 <main id="mv">
 <div class="col"><h2>Problem</h2>
  <div class="card"><h3>H₂ molecule · STO-3G · 0.735 Å</h3>
@@ -108,7 +102,7 @@ button,.lay button,.play{border-radius:0}.play{width:42px;height:42px}
 <div class="col"><h2>Variational circuit</h2>
  <div class="hint">Hover over a step to look inside it</div><div class="pipe" id="pipe"><div class="stage"><b>1 · Prepare</b><span class="t">reference |ψ₀⟩</span><div class="more"></div></div><div class="stage"><b>2 · Ansatz</b><span class="t">U(θ) layers</span><div class="more"></div></div><div class="stage"><b>3 · Measure</b><span class="t">Z &amp; X bases</span><div class="more"></div></div><div class="stage"><b>4 · Cost</b><span class="t">E = ⟨H⟩</span><div class="more"></div></div><div class="stage"><b>5 · Optimize</b><span class="t">θ ← θ − η∇E</span><div class="more"></div></div></div>
  <div class="card"><div class="lay"><span class="mut">Layers (depth)</span><button id="lm">−</button><b id="lv">2</b><button id="lp">+</button>
-  <span class="mut" style="margin-left:auto">gate colour = θ (<span style="color:var(--acc)">■</span> positive, <span style="color:var(--org)">■</span> negative)</span></div>
+  <span class="mut" style="margin-left:auto">gate labels show the angle θ in radians</span></div>
   <div class="circ" id="circ"></div></div>
  <div class="card"><h3>Classical optimizer · parameters θ <span class="mut" style="font-weight:400" id="evs"></span></h3>
   <div class="pr mut"><span>parameter</span><span>value (−π … π)</span><span>θ</span><span style="text-align:right">∂E/∂θ</span></div><div id="params"></div></div>
@@ -122,6 +116,20 @@ button,.lay button,.play{border-radius:0}.play{width:42px;height:42px}
  <div class="card"><h3>Energy landscape (θ₀, θ₁ slice)</h3><canvas id="map" width="30" height="30"></canvas>
   <div class="mut" style="font-size:11px">Dark = low energy. The dot is the current θ; the line is the optimizer's path.</div></div>
 </div></main>
+<details class="learn v" open><summary>The problem · why does H₂ need a quantum computer? <span>click to collapse</span></summary>
+<div class="lg">
+ <div class="lc"><h5>The molecule</h5><svg id="mol" viewBox="0 0 300 250" width="100%"></svg>
+  <div class="mut" style="margin:6px 0 4px">Electron configuration <span>(click one)</span></div><div id="cfg" class="chips"></div><div id="cfgi" class="mut"></div></div>
+ <div class="lc"><h5>The Hamiltonian · H = Σ cᵢPᵢ <span>(hover or click a term)</span></h5><div id="chips" class="chips"></div><div id="pdet"></div></div>
+ <div class="lc"><h5>The variational idea</h5><div id="idea"></div><div id="live"></div></div>
+<div class="lc wide"><h5>What do the two qubits mean? <span>(and what a 0 or 1 reading tells you)</span></h5>
+ <div class="qg">
+  <div class="det"><b>Qubit 0 · the spin-up electron</b><p><b>reads 1</b> → it sits in the low-energy bonding orbital σg.<br><b>reads 0</b> → it was promoted to the antibonding orbital σu.</p></div>
+  <div class="det"><b>Qubit 1 · the spin-down electron</b><p><b>reads 0</b> → bonding orbital σg.<br><b>reads 1</b> → antibonding orbital σu.<br><span class="mut">Inverted relative to qubit 0: a quirk of the parity mapping.</span></p></div>
+  <table id="qtab"></table>
+ </div>
+ <p class="mut">A reading of 0 means Z = +1 and a reading of 1 means Z = −1. Each measurement shot returns one pair of readings, i.e. one electron configuration; the energy is built from many shots.</p></div>
+</div></details>
 <main id="mq">
 <div class="col"><h2>Problem</h2>
  <div class="card"><h3>MaxCut · graph</h3><svg id="gq" viewBox="0 0 240 240" width="100%" style="max-width:260px"></svg>
@@ -131,7 +139,7 @@ button,.lay button,.play{border-radius:0}.play{width:42px;height:42px}
 <div class="col"><h2>Variational circuit</h2>
  <div class="hint">Hover over a step to look inside it</div><div class="pipe" id="qpipe"><div class="stage"><b>1 · Prepare</b><span class="t">|+⟩ on every qubit</span><div class="more"></div></div><div class="stage"><b>2 · Cost</b><span class="t">e^(−iγH_C) · RZZ</span><div class="more"></div></div><div class="stage"><b>3 · Mixer</b><span class="t">e^(−iβB) · RX</span><div class="more"></div></div><div class="stage"><b>4 · Measure</b><span class="t">Z basis → ⟨cut⟩</span><div class="more"></div></div><div class="stage"><b>5 · Optimize</b><span class="t">θ ← θ − η∇E</span><div class="more"></div></div></div>
  <div class="card"><div class="lay"><span class="mut">Layers p</span><button id="qlm">−</button><b id="qlv">2</b><button id="qlp">+</button>
-  <span class="mut" style="margin-left:auto">block colour = angle (<span style="color:var(--acc)">■</span> +, <span style="color:var(--org)">■</span> −)</span></div>
+  <span class="mut" style="margin-left:auto">blocks show the angle in radians</span></div>
   <div class="circ" id="cq"></div></div>
  <div class="card"><h3>Classical optimizer · parameters (γ, β) <span class="mut" style="font-weight:400" id="qevs"></span></h3>
   <div class="pr mut"><span>parameter</span><span>value (−π … π)</span><span>θ</span><span style="text-align:right">∂E/∂θ</span></div><div id="qparams"></div></div>
@@ -142,6 +150,12 @@ button,.lay button,.play{border-radius:0}.play{width:42px;height:42px}
   <div class="mut" style="font-size:11px"><span style="color:var(--acc)">━</span> measured ⟨C⟩ &nbsp;<span style="color:#9aa3b8">━</span> exact &nbsp;<span style="color:#0d7a4b">┅</span> max cut</div></div>
  <div class="card"><h3>Most likely cuts <span class="mut" style="font-weight:400">(green = optimal)</span></h3><svg id="qhist" viewBox="0 0 300 100" width="100%"></svg><table id="qtop"></table></div>
 </div></main>
+<details class="learn qq" open><summary>The problem · how can a quantum computer cut a graph? <span>click to collapse</span></summary>
+<div class="lg">
+ <div class="lc"><h5>Try cutting a graph <span>(click the nodes)</span></h5><div id="gch" class="chips"></div><svg id="cut" viewBox="0 0 240 200" width="100%" style="max-width:280px"></svg><div id="cuti" class="mut"></div></div>
+ <div class="lc"><h5>From cuts to qubits</h5><div id="qmap"></div></div>
+ <div class="lc"><h5>How QAOA finds a good cut</h5><div id="qsteps"></div><div id="qlive"></div></div>
+</div></details>
 <script>
 const $=s=>document.querySelector(s),f=(x,d=4)=>x.toFixed(d);
 const C={g0:-1.0523732,z0:.39793742,z1:-.39793742,zz:-.0112801,xx:.18093119};
@@ -182,7 +196,7 @@ function step(){const r=run(th,S.shots);evals++;hist.push({E:r.E,X:run(th,0).E})
  else{g=grad();if(S.opt==='gd')th=th.map((x,i)=>x-S.lr*g[i]);else{t++;th=th.map((x,i)=>{m1[i]=.9*m1[i]+.1*g[i];m2[i]=.999*m2[i]+.001*g[i]**2;return x-S.lr*(m1[i]/(1-.9**t))/(Math.sqrt(m2[i]/(1-.999**t))+1e-8)})}}
  lastG=g;it++;last=r;render();flash()}
 function flash(){const c=[...document.querySelectorAll((S.prob==='qaoa'?'#mq':'#mv')+' .stage')];c.forEach((e,i)=>setTimeout(()=>{c.forEach(x=>x.classList.remove('on'));e.classList.add('on');if(i===4)setTimeout(()=>e.classList.remove('on'),160)},i*70))}
-const wt=a=>.3+.7*Math.min(Math.abs(a)/Math.PI,1),mixc=(b,w)=>'rgb('+b.map(c=>Math.round(255-(255-c)*w)).join(',')+')',col=a=>mixc(a>=0?[29,43,83]:[232,113,10],wt(a)),tx=a=>wt(a)>.6?'#fff':'#1a1f36';
+const GC={RY:'#d4bbff',RZ:'#d4bbff',RX:'#d4bbff',H:'#ffb3b8',X:'#e8daff'},wt=a=>.3+.7*Math.min(Math.abs(a)/Math.PI,1),mixc=(b,w)=>'rgb('+b.map(c=>Math.round(255-(255-c)*w)).join(',')+')',col=a=>mixc(a>=0?[29,43,83]:[232,113,10],wt(a)),tx=a=>wt(a)>.6?'#fff':'#1a1f36';
 function circuit(){const X0=96,CW=54,Y=[74,138];let free=[1,1],cols={},lay={},mx=0;
  ops.forEach((o,k)=>{const qs=o.t==='CX'?[0,1]:[o.q];let c=o.l<0?0:Math.max(...qs.map(q=>free[q]));if(o.l>=0&&lay[o.l]==null){const m=Math.max(...free);free=[m,m];c=m;lay[o.l]={a:c,b:c}}
   if(o.l<0)c=0;qs.forEach(q=>free[q]=c+1);cols[k]=c;if(o.l>=0){lay[o.l].b=c;mx=Math.max(mx,c)}});
@@ -191,9 +205,9 @@ function circuit(){const X0=96,CW=54,Y=[74,138];let free=[1,1],cols={},lay={},mx
  s+=`<text x="${x(0)-22}" y="20" fill="#6b7280" font-size="10">PREPARE</text>`;
  Object.entries(lay).forEach(([l,v])=>s+=`<rect x="${x(v.a)-26}" y="26" width="${(v.b-v.a)*CW+52}" height="150" rx="0" fill="none" stroke="#c9cfdd" stroke-dasharray="4 3"/><text x="${x(v.a)-20}" y="40" fill="#6b7280" font-size="10">${l<S.L?'LAYER '+(+l+1):'FINAL ROTATIONS'}</text>`);
  s=s.replace(/(<line[^>]*\/><text[^>]*>q\d[^<]*<\/text>)/g,'$1');
- ops.forEach((o,k)=>{const cx=x(cols[k]);if(o.t==='CX'){const c=o.q,tg=1-c;s+=`<line x1="${cx}" x2="${cx}" y1="${Y[c]}" y2="${Y[tg]}" stroke="#1d2b53" stroke-width="2"/><circle cx="${cx}" cy="${Y[c]}" r="4.5" fill="#1d2b53"/><circle cx="${cx}" cy="${Y[tg]}" r="11" fill="#fff" stroke="#1d2b53" stroke-width="2"/><path d="M${cx-11} ${Y[tg]}h22M${cx} ${Y[tg]-11}v22" stroke="#1d2b53" stroke-width="2"/>`}
-  else{const a=o.p==null?0:o.s*th[o.p],fx=o.p==null?'#fff':col(a);s+=`<rect x="${cx-20}" y="${Y[o.q]-15}" width="40" height="30" rx="0" fill="${fx}" stroke="#1d2b53" stroke-width="1.5"/><text x="${cx}" y="${Y[o.q]+4}" text-anchor="middle" fill="${o.p==null?'#1d2b53':tx(a)}" font-weight="600">${o.t[0]}${(o.t[1]||'').toLowerCase()}</text>`+(o.p!=null?`<text x="${cx}" y="${Y[o.q]+29}" text-anchor="middle" fill="#6b7280" font-size="10">${f(a,2)}</text>`:'')}});
- const mxx=x(mx+1.6);Y.forEach(y=>s+=`<rect x="${mxx-20}" y="${y-15}" width="40" height="30" rx="0" fill="#fff" stroke="#1d2b53" stroke-width="1.5"/><path d="M${mxx-11} ${y+7}a11 11 0 0 1 22 0" fill="none" stroke="#1d2b53"/><path d="M${mxx} ${y+7}l7-12" stroke="#e8710a" stroke-width="2"/>`);
+ ops.forEach((o,k)=>{const cx=x(cols[k]);if(o.t==='CX'){const c=o.q,tg=1-c;s+=`<line x1="${cx}" x2="${cx}" y1="${Y[c]}" y2="${Y[tg]}" stroke="#6929c4" stroke-width="2"/><circle cx="${cx}" cy="${Y[c]}" r="4.5" fill="#6929c4"/><circle cx="${cx}" cy="${Y[tg]}" r="11" fill="#6929c4"/><path d="M${cx-11} ${Y[tg]}h22M${cx} ${Y[tg]-11}v22" stroke="#fff" stroke-width="2"/>`}
+  else{const a=o.p==null?0:o.s*th[o.p],fx=o.p==null?'#fff':col(a);s+=`<rect x="${cx-20}" y="${Y[o.q]-15}" width="40" height="30" rx="0" fill="${GC[o.t]||'#e0e0e0'}"/><text x="${cx}" y="${Y[o.q]+4}" text-anchor="middle" fill="#161616" font-weight="600">${o.t[0]}${(o.t[1]||'').toLowerCase()}</text>`+(o.p!=null?`<text x="${cx}" y="${Y[o.q]+29}" text-anchor="middle" fill="#6b7280" font-size="10">${f(a,2)}</text>`:'')}});
+ const mxx=x(mx+1.6);Y.forEach(y=>s+=`<rect x="${mxx-20}" y="${y-15}" width="40" height="30" rx="0" fill="#d9d9d9"/><path d="M${mxx-11} ${y+7}a11 11 0 0 1 22 0" fill="none" stroke="#1d2b53"/><path d="M${mxx} ${y+7}l7-12" stroke="#e8710a" stroke-width="2"/>`);
  s+=`<text x="${mxx-20}" y="20" fill="#6b7280" font-size="10">MEASURE (Z, then H⊗H → X)</text><path d="M${mxx+24} 106h26" stroke="#1d2b53" stroke-width="2" marker-end="url(#a)"/><defs><marker id="a" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0L8 4L0 8z" fill="#1d2b53"/></marker></defs><text x="${mxx+54}" y="110" class="eq" fill="#1d2b53" font-style="italic">⟨H⟩</text></svg>`;
  $('#circ').innerHTML=s}
 function render(){if(S.prob==='qaoa')return renderQ();const T=th,r=last;circuit();$('#it').textContent=it;$('#evs').textContent=`· ${evals} circuit evaluations`;
@@ -269,19 +283,19 @@ function stg(){const s=document.querySelectorAll('#qpipe .t');
  s[0].textContent=S.qin==='plus'?'|+⟩ on every qubit':S.qin==='zero'?'|0…0⟩ (no gates)':S.qin==='bits'?'basis state '+bitsFor():'Dicke state, '+(G.n>>1)+' ones';
  s[2].textContent=S.mix==='xy'?'XY ring · RXX·RYY':S.mix==='grover'?'Grover · e^(−iβ|s⟩⟨s|)':'e^(−iβB) · RX'}
 function circQ(){const n=Math.min(G.n,5),Y=i=>50+i*36,X0=70,LW=150,W=X0+44+S.p*LW+70,H=Y(n-1)+54,bs=S.qin==='bits'?bitsFor():'',tm=S.mix!=='x';
- const bx=(x,i,t,fill,tc)=>`<rect x="${x-16}" y="${Y(i)-13}" width="32" height="26" rx="0" fill="${fill}" stroke="#1d2b53" stroke-width="1.5"/><text x="${x}" y="${Y(i)+4}" text-anchor="middle" fill="${tc}" font-weight="600">${t}</text>`;
- const tall=(x,w,t,sub,fill,tc='#fff')=>`<rect x="${x}" y="${Y(0)-20}" width="${w}" height="${Y(n-1)-Y(0)+40}" rx="0" fill="${fill}" stroke="#1d2b53" stroke-width="1.5"/><text x="${x+w/2}" y="${(Y(0)+Y(n-1))/2}" text-anchor="middle" fill="${tc}" font-weight="600">${t}</text><text x="${x+w/2}" y="${(Y(0)+Y(n-1))/2+15}" text-anchor="middle" fill="${tc}" font-size="10">${sub}</text>`;
+ const bx=(x,i,t,fill,tc)=>`<rect x="${x-16}" y="${Y(i)-13}" width="32" height="26" rx="0" fill="${fill}"/><text x="${x}" y="${Y(i)+4}" text-anchor="middle" fill="${tc}" font-weight="600">${t}</text>`;
+ const tall=(x,w,t,sub,fill,tc='#fff')=>`<rect x="${x}" y="${Y(0)-20}" width="${w}" height="${Y(n-1)-Y(0)+40}" rx="0" fill="${fill}"/><text x="${x+w/2}" y="${(Y(0)+Y(n-1))/2}" text-anchor="middle" fill="${tc}" font-weight="600">${t}</text><text x="${x+w/2}" y="${(Y(0)+Y(n-1))/2+15}" text-anchor="middle" fill="${tc}" font-size="10">${sub}</text>`;
  let s=`<svg width="${W}" height="${H}" font-size="12">`;
  for(let i=0;i<n;i++){s+=`<line x1="52" x2="${W-40}" y1="${Y(i)}" y2="${Y(i)}" stroke="#9aa3b8"/><text x="6" y="${Y(i)+4}" fill="#1a1f36">q${i} |0⟩</text>`;
-  if(S.qin==='plus')s+=bx(X0,i,'H','#fff','#1d2b53');else if(bs[i]==='1')s+=bx(X0,i,'X','#fff','#1d2b53')}
- if(S.qin==='dicke')s+=tall(X0-24,48,'Dicke','k='+(G.n>>1),'#1d2b53');
+  if(S.qin==='plus')s+=bx(X0,i,'H','#ffb3b8','#161616');else if(bs[i]==='1')s+=bx(X0,i,'X','#e8daff','#161616')}
+ if(S.qin==='dicke')s+=tall(X0-24,48,'Dicke','k='+(G.n>>1),'#e8daff','#161616');
  if(G.n>5)s+=`<text x="6" y="${Y(n-1)+26}" fill="#6b7280" font-size="10">⋮ ${G.n} qubits in total</text>`;
  for(let l=0;l<S.p;l++){const x0=X0+44+l*LW,g=th[2*l],b=th[2*l+1];
   s+=`<rect x="${x0-10}" y="6" width="${LW-12}" height="${H-16}" rx="0" fill="none" stroke="#c9cfdd" stroke-dasharray="4 3"/><text x="${x0-4}" y="18" fill="#6b7280" font-size="10">LAYER ${l+1}</text>`;
-  s+=tall(x0,64,'Cost','γ'+(l+1)+'='+f(g,2),col(g),tx(g));
-  if(tm)s+=tall(x0+72,52,S.mix==='xy'?'XY':'Grover','β'+(l+1)+'='+f(b,2),col(2*b),tx(2*b));
-  else{for(let i=0;i<n;i++)s+=bx(x0+96,i,'Rx',col(2*b),tx(2*b));s+=`<text x="${x0+96}" y="${Y(n-1)+34}" text-anchor="middle" fill="#6b7280" font-size="10">β${l+1}=${f(b,2)}</text>`}}
- const mx=W-60;for(let i=0;i<n;i++)s+=`<rect x="${mx-16}" y="${Y(i)-13}" width="32" height="26" rx="0" fill="#fff" stroke="#1d2b53" stroke-width="1.5"/><path d="M${mx-9} ${Y(i)+6}a9 9 0 0 1 18 0" fill="none" stroke="#1d2b53"/><path d="M${mx} ${Y(i)+6}l6-10" stroke="#e8710a" stroke-width="2"/>`;
+  s+=tall(x0,64,'Cost','γ'+(l+1)+'='+f(g,2),'#bae6ff','#161616');
+  if(tm)s+=tall(x0+72,52,S.mix==='xy'?'XY':'Grover','β'+(l+1)+'='+f(b,2),'#d4bbff','#161616');
+  else{for(let i=0;i<n;i++)s+=bx(x0+96,i,'Rx','#d4bbff','#161616');s+=`<text x="${x0+96}" y="${Y(n-1)+34}" text-anchor="middle" fill="#6b7280" font-size="10">β${l+1}=${f(b,2)}</text>`}}
+ const mx=W-60;for(let i=0;i<n;i++)s+=`<rect x="${mx-16}" y="${Y(i)-13}" width="32" height="26" rx="0" fill="#d9d9d9"/><path d="M${mx-9} ${Y(i)+6}a9 9 0 0 1 18 0" fill="none" stroke="#1d2b53"/><path d="M${mx} ${Y(i)+6}l6-10" stroke="#e8710a" stroke-width="2"/>`;
  $('#cq').innerHTML=s+'</svg>'}
 function renderQ(){const r=last,mc=Q?Q.maxcut:null,W=G.edges.length,rb=W/2;
  $('#it').textContent=it;$('#qevs').textContent=`· ${evals} circuit evaluations · minimising −⟨cut⟩`;$('#qlv').textContent=S.p;circQ();stg();
@@ -344,16 +358,16 @@ function stageInfoQ(){const st=[...document.querySelectorAll('#qpipe .more')],r=
  st[2].innerHTML=`<h4>Mixer: phases become probabilities</h4><p>${{x:'RX(2β) on every qubit moves amplitude between bitstrings that differ in one node, so the phase differences from the cost layer interfere.',xy:'The XY ring mixer swaps amplitude between neighbouring nodes while conserving the number of ones: the partition size never changes.',grover:'The Grover mixer reflects about the initial state: e^(−iβ|s⟩⟨s|).'}[S.mix]}</p><p class="mut">β₁ = ${f(b,2)}. Interference boosts good cuts and cancels bad ones.</p>`;
  const sum=top.reduce((a,t)=>a+t.prob,0),ps=[...top.map(t=>t.prob),Math.max(0,1-sum)],cl=[...top.map((t,i)=>`hsl(222,${60-i*5}%,${28+i*6}%)`),'#d9dce3'];
  st[3].innerHTML=`<h4>${S.shots?S.shots+' shots':'∞ shots'} · measured bitstrings</h4><p>${S.shots?'Each square is one measured bitstring; the optimizer only ever sees these samples.':'Illustrative 100-shot draw from the exact distribution.'}</p>${wall(ps,S.shots,cl)}<div class="legend">${top.slice(0,4).map((t,i)=>`<span><i style="background:${cl[i]}"></i><code>${t.bits}</code> ${(t.prob*100).toFixed(1)}%</span>`).join('')}<span><i style="background:#d9dce3"></i>other</span></div><p class="mut">⟨cut⟩ = Σ P(x)·cut(x) = ${f(r.cut,3)}</p>`;
- st[4].innerHTML=optInfo()}
+ st[4].innerHTML=optInfo();qlive(r)}
 // ---------- interactive H2 explainer ----------
 let SEL='xx',BS='01';
-const KI={g0:['Identity · I','constant offset','Nothing to measure. This is the baseline every state pays: the electrons\' kinetic energy plus their attraction to the two protons. (The +0.7200 Ha repulsion between the protons is added classically afterwards.)','No circuit needed.'],
-z0:['Pauli Z on qubit 0 · Z₀','bonding orbital σg','Asks whether the low-energy bonding orbital is filled. Z gives +1 for |0⟩ (empty) and −1 for |1⟩ (filled). The coefficient is positive, so filling it lowers the energy by 2 × 0.398 Ha.','Measure qubit 0 in the Z basis.'],
-z1:['Pauli Z on qubit 1 · Z₁','antibonding orbital σu','The same question for the high-energy antibonding orbital σu. The coefficient is negative, so filling it costs energy: the electrons would rather not be there.','Measure qubit 1 in the Z basis.'],
-zz:['Z ⊗ Z · Z₀Z₁','electron–electron repulsion','Looks at both orbitals together: +1 if both are filled or both empty, −1 if exactly one is filled. A small correction (−0.011 Ha) standing in for how the two electrons repel each other.','Z basis; multiply the two bits (parity).'],
-xx:['X ⊗ X · X₀X₁','electron correlation','The only off-diagonal term. It flips both qubits, so it mixes |01⟩ (the Hartree–Fock guess) with |10⟩ (the electron pair promoted to σu). This mixing is why the true ground state lies below Hartree–Fock, and why a classical mean-field picture misses it.','Rotate both qubits with H first, then measure Z and take the parity.']};
-const CF={'01':'Both electrons in σg: the Hartree–Fock configuration.','10':'Both electrons promoted to σu: a double excitation.','00':'One electron in σg and one in σu: a single excitation.','11':'One electron in σg and one in σu: the other spin arrangement.'};
-const CFG={'01':['ud',''],'10':['','ud'],'00':['u','d'],'11':['d','u']};
+const KI={g0:['Identity · I','constant offset','Nothing to measure. This is the baseline every state pays: electron kinetic energy plus attraction to the two protons. (The +0.7200 Ha repulsion between the protons is added classically afterwards.)','No circuit needed.'],
+z0:['Pauli Z on qubit 0 · Z₀','spin-up electron','Qubit 0 tracks the spin-up electron. Reading 1 (Z = −1) means it sits in the bonding orbital σg; reading 0 (Z = +1) means it was promoted to σu. The coefficient is positive, so σg is 0.796 Ha lower in energy than σu for this electron.','Measure qubit 0 in the Z basis.'],
+z1:['Pauli Z on qubit 1 · Z₁','spin-down electron','Qubit 1 tracks the spin-down electron, with the opposite convention: reading 0 (Z = +1) means σg, reading 1 (Z = −1) means σu. The negative coefficient again makes σu cost 0.796 Ha more than σg.','Measure qubit 1 in the Z basis.'],
+zz:['Z ⊗ Z · Z₀Z₁','electron–electron repulsion','Z₀Z₁ is +1 when the electrons sit in different orbitals (|00⟩, |11⟩) and −1 when they share one (|01⟩, |10⟩). The small coefficient (−0.011 Ha) shifts the energy depending on whether the electrons share an orbital: a stand-in for how they repel each other.','Z basis; multiply the two readings (parity).'],
+xx:['X ⊗ X · X₀X₁','electron correlation','The only off-diagonal term. It flips both qubits, so it mixes |01⟩ (the Hartree–Fock guess) with |10⟩ (both electrons promoted to σu). This mixing is why the true ground state lies below Hartree–Fock, and why a classical mean-field picture misses it.','Rotate both qubits with H first, then measure Z and take the parity.']};
+const CF={'01':'Both electrons in σg: the Hartree–Fock configuration.','10':'Both electrons promoted to σu: a double excitation.','00':'Spin-up electron in σu, spin-down in σg: a single excitation.','11':'Spin-up electron in σg, spin-down in σu: a single excitation.'};
+const CFG={'01':['ud',''],'10':['','ud'],'00':['d','u'],'11':['u','d']};
 function mol(){if(!$('#mol')||!last)return;const hi=k=>SEL===k,dot=(x,y,up)=>`<path d="M${x} ${y+8}v-16l-3 4m3-4l3 4" transform="${up?'':'rotate(180 '+x+' '+y+')'}" stroke="#1a1f36" fill="none" stroke-width="1.6"/>`,or='stroke="#e8710a" stroke-width="2" fill="none" stroke-dasharray="4 3" marker-end="url(#ah)"';
  let s=`<defs><radialGradient id="cl"><stop offset="0" stop-color="#1d2b53" stop-opacity=".5"/><stop offset="1" stop-color="#1d2b53" stop-opacity="0"/></radialGradient><marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0L8 4L0 8z" fill="#e8710a"/></marker></defs>`;
  s+=`<ellipse cx="150" cy="58" rx="${hi('g0')?122:98}" ry="${hi('g0')?46:36}" fill="url(#cl)" ${hi('g0')?'stroke="#e8710a" stroke-dasharray="4 3"':''}/>`;
@@ -370,7 +384,7 @@ function mol(){if(!$('#mol')||!last)return;const hi=k=>SEL===k,dot=(x,y,up)=>`<p
  $('#mol').innerHTML=s;
  document.querySelectorAll('#chips .chip').forEach(e=>e.classList.toggle('on',e.dataset.k===SEL));document.querySelectorAll('#cfg .chip').forEach(e=>e.classList.toggle('on',e.dataset.b===BS));
  const M=Hmat(),bi=parseInt(BS,2),v=last.ev?last.ev[SEL]:null,i=KI[SEL];
- $('#cfgi').innerHTML=`${CF[BS]}<br>⟨${BS}|H|${BS}⟩ = <b>${f(M[bi][bi],4)} Ha</b>`;
+ $('#cfgi').innerHTML=`${CF[BS]}<br>Reading <b>|${BS}⟩</b> (q1 = ${BS[0]}, q0 = ${BS[1]}) · ⟨${BS}|H|${BS}⟩ = <b>${f(M[bi][bi],4)} Ha</b>`;
  $('#pdet').innerHTML=`<div class="det"><div class="dh"><b>${i[0]}</b><span class="big">${SEL==='g0'?'':'c = '}${f(C[SEL],4)} Ha</span></div><div class="tag">${i[1]}</div><p>${i[2]}</p><p class="mut"><b>How we measure it:</b> ${i[3]}</p>${v!=null&&SEL!=='g0'?`<p class="mut">Right now in your circuit: ⟨P⟩ = ${f(v,3)}, contributing ${f(C[SEL]*v,4)} Ha.</p>`:''}</div>`;
  const E=last.E,L0=EX-.012,L1=EHF+.012,pc=x=>Math.min(96,Math.max(4,(x-L0)/(L1-L0)*100));
  $('#live').innerHTML=`<div class="lad"><i class="mk" style="left:${pc(EX)}%;background:#0d7a4b"></i><i class="mk" style="left:${pc(EHF)}%;background:#757575"></i><i class="mk cur" style="left:${pc(E)}%"></i><span class="lt" style="left:${pc(E)}%">E now ${f(E,4)}</span><span class="lb l">exact ${f(EX,4)}</span><span class="lb r">HF ${f(EHF,4)}</span></div><p class="mut">Correlation energy (what Hartree–Fock misses): <b>${f((EHF-EX)*1000,1)} mHa</b>. Chemical accuracy needs an error below 1.6 mHa.</p><div class="mut" style="margin-top:8px">Your circuit's state right now:</div>${amps(psi(th))}<p class="mut">|01⟩ = Hartree–Fock · |10⟩ = double excitation · |00⟩, |11⟩ = single excitations.</p>`}
@@ -379,6 +393,33 @@ $('#chips').innerHTML=TERMS.map(([n,k])=>`<button class="chip" data-k="${k}"><b>
 $('#cfg').innerHTML=['01','10','00','11'].map(b=>`<button class="chip" data-b="${b}"><b>|${b}⟩</b><span>${{'01':'HF','10':'double','00':'single','11':'single'}[b]}</span></button>`).join('');
 document.querySelectorAll('#chips .chip').forEach(e=>{e.onmouseenter=e.onclick=()=>{SEL=e.dataset.k;mol()}});
 document.querySelectorAll('#cfg .chip').forEach(e=>e.onclick=()=>{BS=e.dataset.b;mol()});
+
+// ---------- qubit reading table + measure once ----------
+(function(){const M=Hmat(),R={'01':['σg','σg','Hartree–Fock'],'10':['σu','σu','double excitation'],'00':['σu','σg','single excitation'],'11':['σg','σu','single excitation']};
+ $('#qtab').innerHTML='<tr><th>reading |q1 q0⟩</th><th>↑ (q0)</th><th>↓ (q1)</th><th>⟨H⟩ Ha</th></tr>'+['01','10','00','11'].map(b=>`<tr><td><b>|${b}⟩</b> <span class="mut">${R[b][2]}</span></td><td>${R[b][0]}</td><td>${R[b][1]}</td><td>${f(M[parseInt(b,2)][parseInt(b,2)],4)}</td></tr>`).join('');
+ $('#cfg').insertAdjacentHTML('beforeend','<button class="chip" id="shot"><b>Measure once</b><span>one shot of your circuit</span></button>');
+ $('#shot').onclick=()=>{const q=psi(th),p=[0,1,2,3].map(i=>q.r[i]**2+q.i[i]**2);let r=Math.random(),i=0;while(i<3&&r>p[i]){r-=p[i];i++}BS=KET[i];mol()}})();
+// ---------- MaxCut explainer ----------
+const EXG=[['Square',4,[[0,1],[1,2],[2,3],[3,0]],'A square can be cut completely: alternate the sides and every edge crosses.'],
+['Triangle',3,[[0,1],[1,2],[2,0]],'An odd cycle can never be cut completely. Whatever you do, one edge stays uncut.'],
+['5-cycle',5,[[0,1],[1,2],[2,3],[3,4],[4,0]],'Also an odd cycle: at best 4 of the 5 edges.'],
+['K4',4,[[0,1],[0,2],[0,3],[1,2],[1,3],[2,3]],'Every pair is connected. A 2–2 split cuts 4 of 6 edges.']];
+let GI=0,CB=[];
+const cutOf=(E,x)=>E.filter(([i,j])=>x[i]!==x[j]).length;
+function bestCut(n,E){let b=-1,bx=[];for(let m=0;m<1<<n;m++){const x=Array.from({length:n},(_,i)=>m>>i&1),c=cutOf(E,x);if(c>b){b=c;bx=x}}return{b,bx}}
+function pickG(i){GI=i;const n=EXG[i][1];CB=Array.from({length:n},(_,k)=>k<n/2?0:1);cutUI()}
+function cutUI(){const[nm,n,E,note]=EXG[GI],{b,bx}=bestCut(n,E),c=cutOf(E,CB),pos=i=>[120+70*Math.sin(2*Math.PI*i/n),100-70*Math.cos(2*Math.PI*i/n)];
+ let g=E.map(([a,d])=>{const[x1,y1]=pos(a),[x2,y2]=pos(d),k=CB[a]!==CB[d];return`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${k?'#0d7a4b':'#c9cfdd'}" stroke-width="${k?4:1.5}"${k?'':' stroke-dasharray="4 3"'}/>`}).join('');
+ for(let i=0;i<n;i++){const[x,y]=pos(i);g+=`<g data-i="${i}" style="cursor:pointer"><rect x="${x-15}" y="${y-15}" width="30" height="30" fill="${CB[i]?'#e8710a':'#1d2b53'}"/><text x="${x}" y="${y+5}" text-anchor="middle" fill="#fff" font-weight="700" font-size="13">${i}</text></g>`}
+ $('#cut').innerHTML=g;
+ $('#gch').innerHTML=EXG.map((e,i)=>`<button class="chip${i===GI?' on':''}" data-g="${i}"><b>${e[0]}</b><span>max cut ${bestCut(e[1],e[2]).b}/${e[2].length}</span></button>`).join('')+'<button class="chip" id="bestb"><b>Show best cut</b><span>brute force</span></button>';
+ $('#cuti').innerHTML=`Bitstring <b class="bs">${CB.join('')}</b> cuts <b>${c}</b> of ${E.length} edges${c===b?' <b class="ok">· optimal ✓</b>':' · best possible is '+b}.<br>${note}<br><span class="mut">Green = cut edge, dashed = uncut. Colour = side of the cut.</span>`;
+ $('#qmap').innerHTML=`<p>Each node is a qubit. Reading <b>0</b> puts the node on one side of the cut, reading <b>1</b> on the other, so every bitstring <i>is</i> a cut.</p><p>An edge is cut when its two bits differ, i.e. when ZᵢZⱼ = −1. The number of cut edges is therefore the observable</p><p class="eq" style="text-align:center;font-size:15px">C = Σ<sub>edges</sub> ½ (1 − ZᵢZⱼ)</p><table><tr><th>edge</th><th>bits</th><th>ZᵢZⱼ</th><th>½(1−ZZ)</th></tr>${E.map(([a,d])=>{const z=CB[a]===CB[d]?1:-1;return`<tr><td>${a}–${d}</td><td class="bs">${CB[a]}${CB[d]}</td><td>${z>0?'+1':'−1'}</td><td>${(1-z)/2}</td></tr>`}).join('')}<tr><td colspan="3"><b>total cut</b></td><td><b>${c}</b></td></tr></table><p class="mut">With 2ⁿ possible bitstrings there is no known fast exact method. QAOA minimises −⟨C⟩, so a lower value means a bigger cut.</p>`;
+ document.querySelectorAll('#gch .chip[data-g]').forEach(e=>e.onclick=()=>pickG(+e.dataset.g));$('#bestb').onclick=()=>{CB=bx.slice();cutUI()}}
+$('#cut').onclick=e=>{const g=e.target.closest('[data-i]');if(g){CB[+g.dataset.i]^=1;cutUI()}};
+$('#qsteps').innerHTML=[['1 · Prepare |+⟩ⁿ','A Hadamard on every qubit puts the register in an equal superposition of all 2ⁿ possible cuts at once.'],['2 · Cost layer e^(−iγH_C)','Each bitstring picks up a phase proportional to its cut size, γ·cut(x), using one RZZ gate per edge. Amplitudes are unchanged, so measuring now would still give random cuts.'],['3 · Mixer e^(−iβB)','An RX rotation on every qubit blends neighbouring bitstrings. Because their phases now differ, the amplitudes interfere: constructively for large cuts, destructively for small ones.'],['4 · Measure','Read all qubits in the Z basis. Each shot returns one cut; many shots estimate ⟨C⟩.'],['5 · Optimize (γ, β)','A classical optimizer adjusts the 2p angles to increase ⟨C⟩ and repeats. More layers p give more room to concentrate probability on the best cuts.']].map(([a,b])=>`<div class="det" style="margin-bottom:8px"><b>${a}</b><p>${b}</p></div>`).join('')+'<p class="mut">QAOA is a heuristic and is not guaranteed to find the best cut. For p = 1 on 3-regular graphs it provably reaches 0.692 of the maximum (Farhi et al., 2014); the classical Goemans–Williamson algorithm guarantees 0.878. The bet is that deeper circuits on larger quantum devices can beat classical methods.</p>';
+function qlive(r){if(!$('#qlive')||!G)return;$('#qlive').innerHTML=`<div class="det"><b>Your run on the dashboard</b><p>⟨cut⟩ = ${f(r.cut,2)} of a maximum ${Q?Q.maxcut:'…'}, ratio ${f(r.ratio,3)}.<br>A random guess scores |E|/2 = ${G.edges.length/2}. Probability of an optimal cut: ${(r.p_opt*100).toFixed(1)}%.</p></div>`}
+pickG(0);
 
 init();connect();
 </script></body></html>
