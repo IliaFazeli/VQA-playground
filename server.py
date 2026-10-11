@@ -191,7 +191,7 @@ async def serve(ws: WebSocket, make):
 
 
 # ===================== MaxCut QAOA =====================
-DEFAULT_GRAPH = dict(n=6, edges=[[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 0], [0, 2], [3, 5], [1, 4]])
+DEFAULT_GRAPH = dict(n=7, edges=[[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 0], [0, 2], [3, 5], [1, 7]])
 
 
 class QAOASession(Session):
