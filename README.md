@@ -1,4 +1,4 @@
-# Quantum Playground
+# VQA Playground
 
 An interactive, TensorFlow-Playground-style sandbox for variational quantum algorithms.
 Watch a parameterized circuit, its measurements and a classical optimizer work together.
@@ -15,7 +15,7 @@ pip install -r requirements.txt
 uvicorn server:app --reload
 ```
 
-Then open `quantum_playground_vqe.html` in your browser.
+Then open `vqa_playground.html` in your browser.
 
 No backend? Set **Engine** to *Browser (JS)* for H₂ VQE. QAOA needs the Qiskit backend.
 
@@ -23,10 +23,10 @@ No backend? Set **Engine** to *Browser (JS)* for H₂ VQE. QAOA needs the Qiskit
 
 | File | Purpose |
 |---|---|
-| `quantum_playground_vqe.html` | Front end (single file, no build step) |
+| `vqa_playground.html` | Front end (single file, no build step) |
 | `server.py` | Qiskit backend over WebSockets (`/ws/vqe`, `/ws/qaoa`) |
 | `requirements.txt` | Python dependencies |
 
 ## Roadmap
 
-Bond-length sweep, LiH, a QAOA explainer, noise models.
+Bond-length sweep, LiH, noise models.

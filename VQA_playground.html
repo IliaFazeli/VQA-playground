@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Quantum Playground · VQE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400&display=swap" rel="stylesheet">
+<title>VQA Playground · VQE</title>
 <style>
 :root{box-sizing:border-box;color-scheme:light;--ink:#1a1f36;--acc:#1d2b53;--accl:#e9ecf5;--org:#e8710a;--mut:#6b7280;--line:#dde1ea;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
@@ -82,6 +83,9 @@ button,.lay button,.play{border-radius:0}.play{width:42px;height:42px}
 .circ svg{display:block;margin:0 auto}
 .duo{display:grid;grid-template-columns:230px minmax(0,1fr);gap:16px;align-items:start}@media(max-width:1000px){.duo{grid-template-columns:1fr}}
 .duo canvas{max-width:220px}.cmp .pr{grid-template-columns:92px 1fr 42px 50px;gap:6px;font-size:11px;margin:2px 0}.cmp .pr .bar{height:7px}
+:root{--mut:#858585}
+body,svg text,button,select{font-family:Roboto,"Helvetica Neue",Arial,sans-serif}
+.lc p,.more p,.det p{font-weight:300}.hint,.card>.mut{font-style:italic;font-weight:300}
 </style></head><body>
 <header><h1><b>Quantum</b> Playground <span class="mut" style="font-weight:400">· Variational Quantum Eigensolver</span></h1><span id="st" class="mut" style="margin-left:auto"></span></header>
 <div class="tb">
@@ -206,7 +210,7 @@ const GC={RY:'#d4bbff',RZ:'#9ef0f0',RX:'#a6c8ff',H:'#ffb3b8',X:'#ffd6a5'},wt=a=>
 function circuit(){const X0=96,CW=54,Y=[74,138];let free=[1,1],cols={},lay={},mx=0;
  ops.forEach((o,k)=>{const qs=o.t==='CX'?[0,1]:[o.q];let c=o.l<0?0:Math.max(...qs.map(q=>free[q]));if(o.l>=0&&lay[o.l]==null){const m=Math.max(...free);free=[m,m];c=m;lay[o.l]={a:c,b:c}}
   if(o.l<0)c=0;qs.forEach(q=>free[q]=c+1);cols[k]=c;if(o.l>=0){lay[o.l].b=c;mx=Math.max(mx,c)}});
- const W=X0+(mx+1.6)*CW+96,x=c=>X0+c*CW;let s=`<svg width="${W}" height="196" font-size="12">`;
+ const W=Math.max(X0+(mx+1.6)*CW+96,540),x=c=>X0+c*CW;let s=`<svg width="${W}" height="326" font-size="12"><g transform="translate(0,56)">`;
  Y.forEach((y,q)=>s+=`<line x1="64" x2="${x(mx+1)+20}" y1="${y}" y2="${y}" stroke="#9aa3b8"/><text x="8" y="${y+4}" fill="#1a1f36">q${q} |0⟩</text>`);
  s+=`<text x="${x(0)-22}" y="20" fill="#6b7280" font-size="10">PREPARE</text>`;
  Object.entries(lay).forEach(([l,v])=>s+=`<rect x="${x(v.a)-26}" y="26" width="${(v.b-v.a)*CW+52}" height="150" rx="0" fill="none" stroke="#c9cfdd" stroke-dasharray="4 3"/><text x="${x(v.a)-20}" y="40" fill="#6b7280" font-size="10">${l<S.L?'LAYER '+(+l+1):'FINAL'}</text>`);
@@ -214,8 +218,13 @@ function circuit(){const X0=96,CW=54,Y=[74,138];let free=[1,1],cols={},lay={},mx
  ops.forEach((o,k)=>{const cx=x(cols[k]);if(o.t==='CX'){const c=o.q,tg=1-c;s+=`<line x1="${cx}" x2="${cx}" y1="${Y[c]}" y2="${Y[tg]}" stroke="#6929c4" stroke-width="2"/><circle cx="${cx}" cy="${Y[c]}" r="4.5" fill="#6929c4"/><circle cx="${cx}" cy="${Y[tg]}" r="11" fill="#6929c4"/><path d="M${cx-11} ${Y[tg]}h22M${cx} ${Y[tg]-11}v22" stroke="#fff" stroke-width="2"/>`}
   else{const a=o.p==null?0:o.s*th[o.p],fx=o.p==null?'#fff':col(a);s+=`<rect x="${cx-20}" y="${Y[o.q]-15}" width="40" height="30" rx="0" fill="${GC[o.t]||'#e0e0e0'}"/><text x="${cx}" y="${Y[o.q]+4}" text-anchor="middle" fill="#161616" font-weight="600">${o.t[0]}${(o.t[1]||'').toLowerCase()}</text>`+(o.p!=null?`<text x="${cx}" y="${Y[o.q]+29}" text-anchor="middle" fill="#6b7280" font-size="10">${f(a,2)}</text>`:'')}});
  const mxx=x(mx+1.6);Y.forEach(y=>s+=`<rect x="${mxx-20}" y="${y-15}" width="40" height="30" rx="0" fill="#d9d9d9"/><path d="M${mxx-11} ${y+7}a11 11 0 0 1 22 0" fill="none" stroke="#1d2b53"/><path d="M${mxx} ${y+7}l7-12" stroke="#e8710a" stroke-width="2"/>`);
- s+=`<text x="${mxx-20}" y="20" fill="#6b7280" font-size="10">MEASURE · Z / X</text><path d="M${mxx+24} 106h26" stroke="#1d2b53" stroke-width="2" marker-end="url(#a)"/><defs><marker id="a" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0L8 4L0 8z" fill="#1d2b53"/></marker></defs><text x="${mxx+54}" y="110" class="eq" fill="#1d2b53" font-style="italic">⟨H⟩</text></svg>`;
- $('#circ').innerHTML=s}
+ s+=`<text x="${mxx-20}" y="20" fill="#6b7280" font-size="10">MEASURE · Z / X</text><path d="M${mxx+24} 106h26" stroke="#1d2b53" stroke-width="2" marker-end="url(#a)"/><defs><marker id="a" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0L8 4L0 8z" fill="#1d2b53"/></marker></defs><text x="${mxx+54}" y="110" class="eq" fill="#1d2b53" font-style="italic">⟨H⟩</text>`;
+ const fp=ops.findIndex(o=>o.p!=null&&o.q===1),gx=x(cols[fp]),l0=lay[0].a,fc=ops.findIndex(o=>o.t==='CX'&&cols[ops.indexOf(o)]>l0),cxX=x(cols[fc]),yN=208,xa=Math.max(gx-20,16);
+ s+=NOTEDEF+note(xa,yN,['*R gates* hold a *parameter* θ that','shapes the outcome. We tune every','θ iteratively to push the energy','down (see the optimizer step).'])
+  +arr(`M${gx+36} ${yN-16}C${gx+36} ${yN-42} ${gx+25} ${Y[1]+42} ${gx+25} ${Y[1]+18}`)+'</g>'
+  +note(cxX-20,16,['A *CNOT* gate *entangles* the two qubits, modelling the electron interactions.'])
+  +arr(`M${cxX+6} 56C${cxX+6} 84 ${cxX} 92 ${cxX} ${56+Y[0]-20}`);
+ $('#circ').innerHTML=s+'</svg>'}
 function render(){if(S.prob==='qaoa')return renderQ();const T=th,r=last;circuit();$('#it').textContent=it;$('#evs').textContent=`· ${evals} circuit evaluations`;
  $('#params').innerHTML=P.map((l,i)=>{const w=Math.abs(T[i])/Math.PI*50;return`<div class="pr"><span>${l}</span><div class="bar"><i style="left:${T[i]>=0?50:50-w}%;width:${w}%;background:${T[i]>=0?'#1d2b53':'#e8710a'}"></i></div><span>${f(T[i],2)}</span><em>${f(lastG[i]||0,3)}</em></div>`}).join('');
  const E=r.E,xe=r.Ex!=null?r.Ex:run(th,0).E;$('#E').textContent=f(E,5);const er=(S.shots?E:xe)-EX;$('#err').innerHTML=`<span class="${er<.0016?'ok':''}">${f(er*1000,2)} mHa</span>`;
@@ -288,10 +297,10 @@ function bitsFor(){if(!S.bs||S.bs.length!==G.n)S.bs=Array.from({length:G.n},()=>
 function stg(){const s=document.querySelectorAll('#qpipe .t');
  s[0].textContent=S.qin==='plus'?'|+⟩ on every qubit':S.qin==='zero'?'|0…0⟩ (no gates)':S.qin==='bits'?'basis state '+bitsFor():'Dicke state, '+(G.n>>1)+' ones';
  s[2].textContent=S.mix==='xy'?'XY ring · RXX·RYY':S.mix==='grover'?'Grover · e^(−iβ|s⟩⟨s|)':'e^(−iβB) · RX'}
-function circQ(){const n=Math.min(G.n,5),Y=i=>50+i*36,X0=70,LW=150,W=X0+44+S.p*LW+70,H=Y(n-1)+54,bs=S.qin==='bits'?bitsFor():'',tm=S.mix!=='x';
+function circQ(){const n=Math.min(G.n,5),Y=i=>50+i*36,X0=70,LW=150,W=Math.max(X0+44+S.p*LW+70,390),H=Y(n-1)+54,bs=S.qin==='bits'?bitsFor():'',tm=S.mix!=='x';
  const bx=(x,i,t,fill,tc)=>`<rect x="${x-16}" y="${Y(i)-13}" width="32" height="26" rx="0" fill="${fill}"/><text x="${x}" y="${Y(i)+4}" text-anchor="middle" fill="${tc}" font-weight="600">${t}</text>`;
  const tall=(x,w,t,sub,fill,tc='#fff')=>`<rect x="${x}" y="${Y(0)-20}" width="${w}" height="${Y(n-1)-Y(0)+40}" rx="0" fill="${fill}"/><text x="${x+w/2}" y="${(Y(0)+Y(n-1))/2}" text-anchor="middle" fill="${tc}" font-weight="600">${t}</text><text x="${x+w/2}" y="${(Y(0)+Y(n-1))/2+15}" text-anchor="middle" fill="${tc}" font-size="10">${sub}</text>`;
- let s=`<svg width="${W}" height="${H}" font-size="12">`;
+ let s=`<svg width="${W}" height="${H+84}" font-size="12">`;
  for(let i=0;i<n;i++){s+=`<line x1="52" x2="${W-40}" y1="${Y(i)}" y2="${Y(i)}" stroke="#9aa3b8"/><text x="6" y="${Y(i)+4}" fill="#1a1f36">q${i} |0⟩</text>`;
   if(S.qin==='plus')s+=bx(X0,i,'H','#ffb3b8','#161616');else if(bs[i]==='1')s+=bx(X0,i,'X','#ffd6a5','#161616')}
  if(S.qin==='dicke')s+=tall(X0-24,48,'Dicke','k='+(G.n>>1),'#e8daff','#161616');
@@ -302,6 +311,11 @@ function circQ(){const n=Math.min(G.n,5),Y=i=>50+i*36,X0=70,LW=150,W=X0+44+S.p*L
   if(tm)s+=tall(x0+72,52,S.mix==='xy'?'XY':'Grover','β'+(l+1)+'='+f(b,2),'#a6c8ff','#161616');
   else{for(let i=0;i<n;i++)s+=bx(x0+96,i,'Rx','#a6c8ff','#161616');s+=`<text x="${x0+96}" y="${Y(n-1)+34}" text-anchor="middle" fill="#6b7280" font-size="10">β${l+1}=${f(b,2)}</text>`}}
  const mx=W-60;for(let i=0;i<n;i++)s+=`<rect x="${mx-16}" y="${Y(i)-13}" width="32" height="26" rx="0" fill="#d9d9d9"/><path d="M${mx-9} ${Y(i)+6}a9 9 0 0 1 18 0" fill="none" stroke="#1d2b53"/><path d="M${mx} ${Y(i)+6}l6-10" stroke="#e8710a" stroke-width="2"/>`;
+ const xq=X0+44,yQ=H+12,yb=Y(n-1),tmX=tm?xq+98:xq+122,tmY=tm?yb+24:yb+14;
+ s+=NOTEDEF+note(xq-10,yQ,['*Cost layer:* gives each','bitstring a phase','γ·(cut size): one RZZ','gate per edge.'])
+  +arr(`M${xq+10} ${yQ-16}C${xq+10} ${yQ-40} ${xq+32} ${yb+52} ${xq+32} ${yb+26}`)
+  +note(xq+130,yQ,['*Mixer*: blends neighbouring', 'bitstrings so good cuts', 'interfere and grow.'])
+  +arr(`M${xq+142} ${yQ-16}C${xq+142} ${yQ-40} ${tmX+4} ${tmY+36} ${tmX} ${tmY+2}`);
  $('#cq').innerHTML=s+'</svg>'}
 function renderQ(){const r=last,mc=Q?Q.maxcut:null,W=G.edges.length,rb=W/2;
  $('#it').textContent=it;$('#qevs').textContent=`· ${evals} circuit evaluations · minimising −⟨cut⟩`;$('#qlv').textContent=S.p;circQ();stg();
@@ -427,5 +441,9 @@ $('#qsteps').innerHTML=[['1 · Prepare |+⟩ⁿ','A Hadamard on every qubit puts
 function qlive(r){if(!$('#qlive')||!G)return;$('#qlive').innerHTML=`<div class="det"><b>Your run on the dashboard</b><p>⟨cut⟩ = ${f(r.cut,2)} of a maximum ${Q?Q.maxcut:'…'}, ratio ${f(r.ratio,3)}.<br>A random guess scores |E|/2 = ${G.edges.length/2}. Probability of an optimal cut: ${(r.p_opt*100).toFixed(1)}%.</p></div>`}
 pickG(0);
 
+// ---------- annotation notes (Playground style) ----------
+const NOTEDEF='<defs><marker id="na" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M1 1L7 4.5L1 8" fill="none" stroke="#9a9a9a" stroke-width="1.3"/></marker></defs>';
+const note=(x,y,L)=>`<text x="${x}" y="${y}" font-size="12" font-style="italic" fill="#8a8a8a">${L.map((l,i)=>`<tspan x="${x}" dy="${i?15:0}">${l.replace(/\*(.+?)\*/g,'<tspan font-weight="700">$1</tspan>')}</tspan>`).join('')}</text>`;
+const arr=d=>`<path d="${d}" fill="none" stroke="#9a9a9a" stroke-width="1.3" marker-end="url(#na)"/>`;
 init();connect();
 </script></body></html>
