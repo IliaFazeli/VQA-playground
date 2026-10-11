@@ -11,12 +11,23 @@ from qiskit.quantum_info import SparsePauliOp, Statevector
 
 app = FastAPI()
 
-# H2 / STO-3G / 0.735 A / parity mapping, 2-qubit reduced (same numbers as the front end)
-C = dict(g0=-1.0523732, z0=0.39793742, z1=-0.39793742, zz=-0.0112801, xx=0.18093119)
-H = SparsePauliOp.from_list([("II", C["g0"]), ("IZ", C["z0"]), ("ZI", C["z1"]),
-                             ("ZZ", C["zz"]), ("XX", C["xx"])])  # rightmost char = qubit 0
-HM = H.to_matrix()
-EXACT, HF = float(np.linalg.eigvalsh(HM)[0]), float(HM[1, 1].real)
+# 2-qubit electronic Hamiltonians (parity mapping, tapered); rightmost Pauli char = qubit 0.
+# H2: STO-3G 0.735 A.  LiH: STO-3G, Li 1s core frozen, 2 electrons in 2 orbitals (2sigma/3sigma), PySCF integrals.
+MOLS = {
+    "h2":   dict(g0=-1.0523732, z0=0.39793742, z1=-0.39793742, zz=-0.0112801, xx=0.18093119),
+    "lih":  dict(g0=-8.6096017, z0=0.1711307, z1=-0.1711307, zz=-0.0945217, xx=0.0130140),    # 1.595 A
+    "lih3": dict(g0=-8.113068, z0=0.0937509, z1=-0.0937509, zz=-0.0605627, xx=0.0610303),     # 3.0 A
+}
+
+
+def mol_data(name):
+    c = MOLS[name]
+    h = SparsePauliOp.from_list([("II", c["g0"]), ("IZ", c["z0"]), ("ZI", c["z1"]),
+                                 ("ZZ", c["zz"]), ("XX", c["xx"])])
+    hm = h.to_matrix()
+    return c, float(np.linalg.eigvalsh(hm)[0]), float(hm[1, 1].real)   # coefficients, exact, Hartree-Fock (|01>)
+
+
 B0 = np.array([1 - 2 * (i & 1) for i in range(4)])
 B1 = np.array([1 - 2 * (i >> 1) for i in range(4)])
 
@@ -54,6 +65,7 @@ def build_ops(ans, ref, L):
 
 class Session:
     def __init__(self, m):
+        self.C, self.exact, self.hf = mol_data(m.get("mol", "h2"))
         self.ops, n = build_ops(m["ans"], m["ref"], int(m["L"]))
         self.theta = np.array(m["theta"], float)
         if len(self.theta) != n:
@@ -94,7 +106,8 @@ class Session:
         qx = qc.copy(); qx.h([0, 1])          # rotate to the X basis
         px = self._probs(qx, shots)
         z0, z1, zz, xx = pz @ B0, pz @ B1, pz @ (B0 * B1), px @ (B0 * B1)
-        E = C["g0"] + C["z0"] * z0 + C["z1"] * z1 + C["zz"] * zz + C["xx"] * xx
+        c = self.C
+        E = c["g0"] + c["z0"] * z0 + c["z1"] * z1 + c["zz"] * zz + c["xx"] * xx
         return dict(E=float(E), pz=pz.tolist(), px=px.tolist(),
                     ev=dict(g0=1.0, z0=float(z0), z1=float(z1), zz=float(zz), xx=float(xx)))
 
@@ -111,7 +124,7 @@ class Session:
     def snapshot(self):
         r = self.evaluate(self.theta, self.shots)
         ex = r["E"] if not self.shots else self.evaluate(self.theta, 0)["E"]
-        return dict(type="ready", exact=EXACT, hf=HF, E=r["E"], E_exact=ex,
+        return dict(type="ready", exact=self.exact, hf=self.hf, E=r["E"], E_exact=ex,
                     ev=r["ev"], pz=r["pz"], px=r["px"])
 
     def step(self):
