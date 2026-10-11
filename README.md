@@ -1,7 +1,7 @@
 # VQA Playground
 
 An interactive, TensorFlow-Playground-style sandbox for variational quantum algorithms.
-Watch a parameterized circuit, its measurements and a classical optimizer work together.
+Watch a parameterized circuit, its measurements and a classical optimizer work together. This app was built using FastAPI.
 
 - **VQE:** ground-state energy of H₂ (STO-3G, 0.735 Å, 2 qubits), with an interactive explainer of the Hamiltonian
 - **QAOA:** MaxCut on small graphs
