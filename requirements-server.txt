@@ -1,0 +1,5 @@
+# Only for the local interactive playground (server.py). Not needed on Qollab.
+fastapi
+uvicorn[standard]
+qiskit
+numpy

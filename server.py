@@ -13,6 +13,7 @@ app = FastAPI()
 
 # 2-qubit electronic Hamiltonians (parity mapping, tapered); rightmost Pauli char = qubit 0.
 # H2: STO-3G 0.735 A.  LiH: STO-3G, Li 1s core frozen, 2 electrons in 2 orbitals (2sigma/3sigma), PySCF integrals.
+# LiH3 serves to show what quantum computing brings to the table that classical cannot (heavy XX weight)
 MOLS = {
     "h2":   dict(g0=-1.0523732, z0=0.39793742, z1=-0.39793742, zz=-0.0112801, xx=0.18093119),
     "lih":  dict(g0=-8.6096017, z0=0.1711307, z1=-0.1711307, zz=-0.0945217, xx=0.0130140),    # 1.595 A

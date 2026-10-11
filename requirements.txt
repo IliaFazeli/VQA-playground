@@ -1,4 +1,2 @@
-fastapi
-uvicorn[standard]
-qiskit
-numpy
+# Read by Qollab's runtime. Qiskit and NumPy are provided there, so nothing else is needed to run main.py.
+# The local playground server has its own list: requirements-server.txt
