@@ -1,10 +1,7 @@
 # Quantum Playground: Variational Quantum Algorithms
 
-
-An interactive, TensorFlow-Playground-style sandbox for variational quantum algorithms.
-Watch a parameterized circuit, its measurements and a classical optimizer work together. This app was built using FastAPI.
-=======
-**An interactive, TensorFlow-Playground-style sandbox that shows how a variational quantum algorithm (VQA) works:
+## What it is
+This is a 2026 Qollab Hackathon submission. **An interactive, TensorFlow-Playground-style sandbox that shows how a variational quantum algorithm (VQA) works:
 a parameterized circuit, its measurements, and a classical optimizer that keeps readjusting the circuit's angles.**
 
 Hackathon theme: **Quantum Unlocked** 
@@ -94,9 +91,8 @@ Future developments could add a bond-length slider, adjustable noise models, and
 ## Disclosure and credits
 
 Built during the hackathon window (Oct 9–11, 2026)
-AI was used to write code and documentation. 
-Built on [Qiskit](https://qiskit.org), NumPy, [FastAPI](https://fastapi.tiangolo.com) and the Roboto font; [PySCF](https://pyscf.org) was used once,
-offline, to generate the LiH Hamiltonian coefficients. The layout and look are heavily inspired by the [TensorFlow Playground](https://playground.tensorflow.org).
+The code is fully AI (generated with Claude, then with modifications made on top).
+Built on [Qiskit](https://qiskit.org), NumPy, [FastAPI](https://fastapi.tiangolo.com) and the Roboto font; [PySCF](https://pyscf.org) was used once offline, to generate the LiH Hamiltonian coefficients. The layout and look are heavily inspired by the [TensorFlow Playground](https://playground.tensorflow.org).
 
 ## License
 
